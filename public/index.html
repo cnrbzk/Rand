@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" ng-app="randomApp">
+<head runat="server">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>Random!</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/main.css" rel="stylesheet" />
+    <style>
+        #ajaxLoaderDiv {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            background-color: #fff;
+            opacity: .7;
+            text-align: center;
+            display: none;
+        }
+
+        .ajax-loader {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-left: -109px; /* -1 * image width / 2 */
+            margin-top: -75px; /* -1 * image height / 2 */
+        }
+
+        .hubStatus {
+            position: relative;
+            display: inline-block;
+            top: 50%;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <form name="mainForm" novalidate>
+        <div id="ajaxLoaderDiv">
+            <img src="image/ajax-loader.gif" class="ajax-loader" />
+            <span id="hubStatusSpan" class="hubStatus"></span>
+        </div>
+        <div id="mainDiv" class="container-fluid" ng-controller="randomCtrl" style="display: none">
+            <section id="setNickname" ng-hide="hasNickname">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h2><span class="text-primary">Please set your name</span></h2>
+                        <div class="input-group">
+                            <input id="nickName" name="nickname" type="text" class="form-control input-lg" ng-model="user.nickname" placeholder="Name" capitalize required />
+                            <span class="input-group-btn">
+                                <button class="btn btn-default btn-lg" type="button" ng-disabled="mainForm.nickname.$invalid" ng-click="setNickname()">Set!</button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section id="createJoinGroup" ng-show="showIndex">
+                <h2><span class="text-primary">Welcome {{user.nickname + '! '}}</span><a class="text-warning" ng-click="clearNickname()">(Change)</a></h2>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <input id="groupName" name="groupName" type="text" class="form-control input-lg" ng-model="groupName" placeholder="Group Name" capitalize required />
+                        <div class="alert alert-danger" role="alert" ng-show="errorMsg && errorMsg.length > 0">{{errorMsg}}</div>
+                        <input type="password" class="form-control input-lg" ng-model="password" placeholder="Password (Optional)" />
+                        <button type="button" class="btn btn-success center-block btn-lg btn-block" ng-disabled="mainForm.groupName.$invalid" ng-click="joinGroupClicked()">Go!</button>
+                    </div>
+                </div>
+            </section>
+            <section id="group" ng-show="hasGroup">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <button type="button" class="btn btn-primary btn-sm" ng-click="leaveGroup()" ng-disabled="hasRandProcess"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>Back</button>
+                    </div>
+                </div>
+                <h3><span class="label label-default center-block">{{user.group}}</span></h3>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <ul class="list-group">
+                            <li class="list-group-item text-center" ng-repeat="u in userList"
+                                ng-class="{'list-group-item-danger' : (randConnId == u.connectionId && hasRandProcess) , 
+                                'list-group-item-info' : randConnId != u.connectionId , 
+                                'list-group-item-success' : (randConnId == u.connectionId && !hasRandProcess)}">
+                                <span class="glyphicon glyphicon-star-empty" aria-hidden="true" ng-hide="u.connectionId == randConnId"></span>
+                                <span class="glyphicon glyphicon-star" aria-hidden="true" ng-show="u.connectionId == randConnId"></span>
+                                {{u.nickname}}
+                            </li>
+                        </ul>
+                        <button type="button" class="btn btn-warning center-block btn-lg btn-block" ng-show="groupAdmin.connectionId == user.connectionId" ng-click="startRandom()" ng-disabled="hasRandProcess">Random!</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <script src="js/jquery-1.9.1.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="js/angular.min.js"></script>
+        <script src="js/randomApp.js"></script>
+        <script src="js/services.js"></script>
+        <script src="js/randomCtrl.js"></script>
+        <script src="js/custom.js"></script>
+    </form>
+</body>
+</html>

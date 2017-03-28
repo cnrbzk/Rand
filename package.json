@@ -1,0 +1,10 @@
+{
+  "name": "socket-random-application",
+  "version": "0.0.1",
+  "description": "random group application",
+  "dependencies": {
+    "express": "~4.10.4",
+    "socket.io": "~1.2.1",
+    "socket.io-cookie": "0.0.1"
+  }
+}
